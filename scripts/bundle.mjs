@@ -19,7 +19,7 @@ console.log("2/4 stage bundle/");
 fs.rmSync(bundle, { recursive: true, force: true });
 fs.rmSync(out, { force: true });
 fs.mkdirSync(bundle, { recursive: true });
-for (const f of ["manifest.json", "package.json", "package-lock.json", "README.md", "LICENSE"]) {
+for (const f of ["manifest.json", "package.json", "package-lock.json", "README.md", "LICENSE", "icon.png"]) {
   fs.copyFileSync(path.join(root, f), path.join(bundle, f));
 }
 fs.cpSync(path.join(root, "dist"), path.join(bundle, "dist"), { recursive: true });

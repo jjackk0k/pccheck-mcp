@@ -128,6 +128,12 @@ export async function scanFolderSizes(args: ScanArgs) {
       return;
     }
     await acquire();
+    // Re-check after the queue wait: thousands of walks can be queued when the budget expires
+    if (Date.now() > deadline) {
+      truncated = true;
+      release();
+      return;
+    }
     let entries;
     try {
       entries = await fs.readdir(dir, { withFileTypes: true });
@@ -172,6 +178,10 @@ export async function scanFolderSizes(args: ScanArgs) {
 
   const jobs: Promise<void>[] = [];
   for (const e of rootEntries) {
+    if (Date.now() > deadline) {
+      truncated = true;
+      break;
+    }
     const full = path.join(root, e.name);
     try {
       if (e.isSymbolicLink()) continue;

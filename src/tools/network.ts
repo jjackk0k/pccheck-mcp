@@ -38,9 +38,13 @@ async function dnsTiming(): Promise<{ ok: boolean; ms: number | null }> {
   try {
     const resolver = new Resolver();
     const start = process.hrtime.bigint();
-    await resolver.resolve4("cloudflare.com");
+    const ok = await withTimeout(
+      resolver.resolve4("cloudflare.com").then(() => true),
+      5000,
+      false,
+    );
     const ms = Number(process.hrtime.bigint() - start) / 1e6;
-    return { ok: true, ms: round1(ms) };
+    return ok ? { ok: true, ms: round1(ms) } : { ok: false, ms: null };
   } catch {
     return { ok: false, ms: null };
   }
@@ -96,14 +100,20 @@ export async function networkCheck() {
     (best, p) => (p.received > 0 && (best == null || (p.avgMs ?? 1e9) < (best.avgMs ?? 1e9)) ? p : best),
     null,
   );
-  const onWifi = active.some((a) => a.type === "wireless" && a.isDefault) || (wifi != null && !("raw" in (wifi as object)));
+  const defaultIface = active.find((a) => a.isDefault);
+  const onWifi = defaultIface
+    ? defaultIface.type === "wireless"
+    : wifi != null && !("raw" in (wifi as object));
 
   const hints: string[] = [];
-  if (router && router.received === 0) {
-    hints.push("Your PC cannot reach your own router — the problem is local: wifi connection, cable, or network adapter.");
+  if (router && router.received === 0 && bestInternet == null) {
+    hints.push("Your PC cannot reach your own router and the internet is unreachable — the problem is local: wifi connection, cable, or network adapter.");
   } else if (bestInternet == null) {
-    hints.push(router ? "Router responds but the internet does not — modem or ISP problem. Power-cycling modem and router is the standard first fix." : "No internet reachability detected.");
+    hints.push(router && router.received > 0 ? "Router responds but the internet does not — modem or ISP problem. Power-cycling modem and router is the standard first fix." : "No internet reachability detected.");
   } else {
+    if (router && router.received === 0) {
+      hints.push("Your router doesn't answer pings (many routers block this — usually not a fault). The internet is reachable, so the connection itself works.");
+    }
     if (router?.avgMs != null && router.avgMs > 30 && onWifi) {
       hints.push(`Latency to your own router is high (${router.avgMs}ms) — weak wifi signal or interference. Moving closer or using 5GHz usually fixes this.`);
     }

@@ -23,6 +23,7 @@ const server = new McpServer(
       "For a vague complaint ('my PC is slow'), start with full_checkup or performance_snapshot. " +
       "Present results as a friendly diagnosis: verdict first, then evidence in plain language. " +
       "Numbers alone mean nothing to most users — always interpret them. " +
+      "Gaming complaints (stutter, low FPS, crashes in games): call performance_snapshot + temperatures + gpu_info together. " +
       "These tools NEVER change anything; when a fix is needed, explain how the user can do it themselves.",
   },
 );
@@ -37,7 +38,7 @@ server.registerTool(
       "Run a complete PC health checkup in one call: hardware specs, live CPU/RAM/GPU load, temperatures, disk space + disk health, crash history, antivirus status, startup programs, and network. Use for 'check my PC', 'why is my PC slow', 'is my computer healthy', or any broad diagnostic request. Takes ~20-30 seconds.",
     annotations: RO,
   },
-  safe(async () => text(await fullCheckup())),
+  safe(async () => text(await fullCheckup(), true)),
 );
 
 server.registerTool(
@@ -56,7 +57,7 @@ server.registerTool(
   {
     title: "Performance snapshot",
     description:
-      "Live performance right now: overall + per-core CPU load, RAM usage and pressure, GPU utilization, and the top processes by CPU and by memory. Use when the PC is slow/laggy/loud RIGHT NOW to find what's hogging resources.",
+      "Live performance right now: overall + per-core CPU load, RAM usage and pressure, GPU utilization, and the top processes by CPU and by memory. Use when the PC is slow, laggy, or freezing RIGHT NOW, or when games stutter or drop FPS, to find what's hogging resources.",
     annotations: RO,
   },
   safe(async () => text(await performanceSnapshot())),
@@ -143,18 +144,18 @@ server.registerTool(
   {
     title: "Network & wifi check",
     description:
-      "Diagnose the internet connection: active adapters, wifi signal quality, ping to the router vs the internet (separates 'my wifi is bad' from 'my ISP is down'), DNS speed, and a plain-language diagnosis. Use for slow internet, lag, or connection drops.",
+      "Diagnose the internet connection: active adapters, wifi signal quality, ping to the router vs the internet (separates 'my wifi is bad' from 'my ISP is down'), DNS speed, and a plain-language diagnosis. Measures latency and packet loss, not download speed in Mbps. Use for slow internet, lag, or connection drops.",
     annotations: RO,
   },
   safe(async () => text(await networkCheck())),
 );
 
 server.registerTool(
-  "crash_and_health_report",
+  "crash_report",
   {
-    title: "Crash history & system health",
+    title: "Crash history & stability",
     description:
-      "Windows stability report: blue screens and unexpected shutdowns (last 30 days), app crashes (last 14 days), antivirus status, pending-reboot state, and disk SMART health. Use for 'my PC crashed/blue-screened', random restarts, or a general health audit.",
+      "Windows stability report: blue screens and unexpected shutdowns (last 30 days), app crashes (last 14 days), antivirus status, pending-reboot state, and disk SMART health. Use for crashes, freezes, random restarts, blue screens, or 'my PC turned itself off'.",
     annotations: RO,
   },
   safe(async () => text(await crashAndHealthReport())),

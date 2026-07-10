@@ -25,7 +25,7 @@ export async function gpuInfo() {
       main: d.main || undefined,
     })),
     displayNote: graphics.displays.some(
-      (d) => (d.currentRefreshRate ?? 60) <= 60 && (d.resolutionX ?? 0) >= 1920,
+      (d) => d.currentRefreshRate != null && d.currentRefreshRate <= 60 && (d.resolutionX ?? 0) >= 1920,
     )
       ? "A display is running at 60Hz — if the monitor supports more, raising the refresh rate is a free upgrade"
       : undefined,

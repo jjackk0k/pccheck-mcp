@@ -109,9 +109,9 @@ export interface ToolResult {
   [key: string]: unknown;
 }
 
-/** Wrap data as an MCP text result. */
-export function text(data: unknown): ToolResult {
-  const body = typeof data === "string" ? data : JSON.stringify(data, null, 1);
+/** Wrap data as an MCP text result. Compact mode for large payloads (saves tokens). */
+export function text(data: unknown, compact = false): ToolResult {
+  const body = typeof data === "string" ? data : JSON.stringify(data, null, compact ? 0 : 1);
   return { content: [{ type: "text", text: body }] };
 }
 
@@ -132,8 +132,11 @@ export function safe<A>(fn: (args: A) => Promise<ToolResult>): (args: A) => Prom
 
 /** Resolve to a fallback value if the promise takes longer than ms. */
 export function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  let timer: NodeJS.Timeout | undefined;
   return Promise.race([
     p.catch(() => fallback),
-    new Promise<T>((res) => setTimeout(() => res(fallback), ms)),
-  ]);
+    new Promise<T>((res) => {
+      timer = setTimeout(() => res(fallback), ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
 }

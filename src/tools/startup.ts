@@ -41,9 +41,15 @@ export async function startupPrograms() {
     const payload = await psJson<WinStartupPayload>(WIN_SCRIPT, 20_000);
     if (!payload) return { error: "Could not read startup programs (PowerShell query failed)." };
 
-    const approved = payload.approved ?? {};
+    // Registry names are case-insensitive, and StartupApproved\StartupFolder keys
+    // include the shortcut extension (".lnk") while Win32_StartupCommand names don't.
+    const approved = new Map<string, boolean>();
+    for (const [k, v] of Object.entries(payload.approved ?? {})) approved.set(k.toLowerCase(), v);
+    const lookupEnabled = (name: string) =>
+      approved.get(name.toLowerCase()) ?? approved.get(name.toLowerCase() + ".lnk");
+
     const items = asArray(payload.items).map((i) => {
-      const enabled = approved[i.Name] ?? true;
+      const enabled = lookupEnabled(i.Name) ?? true;
       return {
         name: i.Name,
         enabled,

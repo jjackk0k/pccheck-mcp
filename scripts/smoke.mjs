@@ -19,11 +19,16 @@ const CALLS = [
   ["disk_space", {}],
   ["startup_programs", {}],
   ["installed_software", { limit: 10 }],
-  ["crash_and_health_report", {}],
+  ["crash_report", {}],
   ["network_check", {}],
   ["scan_folder_sizes", { path: path.join(os.homedir(), "Downloads"), time_budget_seconds: 10 }],
   ["full_checkup", {}],
 ].filter(([name]) => !only || name === only);
+
+if (only && CALLS.length === 0) {
+  console.error(`Unknown tool "${only}" — nothing to test.`);
+  process.exit(2);
+}
 
 const child = spawn("node", [entry], { stdio: ["pipe", "pipe", "pipe"] });
 child.stderr.on("data", () => {}); // startup banner — ignore
