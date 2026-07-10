@@ -1,0 +1,50 @@
+{
+  "name": "pccheck-mcp",
+  "version": "0.1.0",
+  "description": "Give Claude X-ray vision into your PC. Read-only MCP server for hardware specs, live performance, temperatures, disk space hogs, crash history, startup bloat, and wifi diagnostics — so \"why is my PC slow?\" finally gets a real answer.",
+  "type": "module",
+  "license": "MIT",
+  "mcpName": "io.github.jacknaughton/pccheck-mcp",
+  "bin": {
+    "pccheck-mcp": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "start": "node dist/index.js",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "claude",
+    "claude-desktop",
+    "system-information",
+    "diagnostics",
+    "hardware",
+    "windows",
+    "pc-health",
+    "gpu",
+    "performance",
+    "troubleshooting"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "systeminformation": "^5.31.16",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^7.0.2"
+  }
+}
