@@ -1,0 +1,42 @@
+{
+  "manifest_version": "0.2",
+  "name": "pccheck",
+  "display_name": "PCCheck — PC Health for Claude",
+  "version": "0.1.0",
+  "description": "Ask Claude why your PC is slow and get a real answer: specs, live performance, temperatures, disk hogs, crashes, and wifi — 100% read-only.",
+  "long_description": "PCCheck gives Claude read-only eyes into your computer: hardware specs, live CPU/GPU/RAM load, temperatures, disk space and what's eating it, startup bloat, blue-screen history, antivirus status, and wifi quality.\n\nAsk things like:\n- \"Run a full checkup on my PC\"\n- \"Why is my computer slow right now?\"\n- \"What's eating my disk space?\"\n- \"Can my PC run Cyberpunk 2077?\"\n- \"Why did my PC crash yesterday?\"\n- \"Is my wifi the problem or my internet provider?\"\n\nPrivacy: every tool is strictly read-only — nothing can be changed, deleted, or installed. No telemetry, no accounts; the only network activity is the ping test (router, 1.1.1.1, 8.8.8.8).",
+  "author": {
+    "name": "Jack Naughton"
+  },
+  "license": "MIT",
+  "keywords": ["pc", "diagnostics", "hardware", "performance", "windows", "gpu", "disk-space", "troubleshooting", "system-monitor"],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"]
+    }
+  },
+  "tools": [
+    { "name": "full_checkup", "description": "Complete PC health checkup in one call" },
+    { "name": "system_overview", "description": "Hardware specs: CPU, RAM, GPU, drives, displays" },
+    { "name": "performance_snapshot", "description": "Live CPU/RAM/GPU load and top processes" },
+    { "name": "top_processes", "description": "Processes by CPU or memory, filterable" },
+    { "name": "gpu_info", "description": "GPU details, live NVIDIA stats, display refresh rates" },
+    { "name": "temperatures", "description": "CPU/GPU temperatures and cooling status" },
+    { "name": "disk_space", "description": "Drive fullness and SSD/HDD health" },
+    { "name": "scan_folder_sizes", "description": "Rank folders by size to find space hogs" },
+    { "name": "startup_programs", "description": "Boot programs and their enabled/disabled state" },
+    { "name": "network_check", "description": "Router-vs-internet ping diagnosis and wifi quality" },
+    { "name": "crash_and_health_report", "description": "Blue screens, app crashes, antivirus, disk SMART" },
+    { "name": "installed_software", "description": "Installed programs by size or install date" },
+    { "name": "battery_health", "description": "Laptop battery wear and charge status" }
+  ],
+  "compatibility": {
+    "platforms": ["win32", "darwin", "linux"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  }
+}
