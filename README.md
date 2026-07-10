@@ -1,10 +1,21 @@
-# 🩺 PCCheck — let Claude actually check your PC
+<p align="center">
+  <img src="icon.png" width="120" alt="PCCheck logo">
+</p>
+
+<h1 align="center">🩺 PCCheck — let Claude actually check your PC</h1>
+
+<p align="center">
+  <a href="https://github.com/jjackk0k/pccheck-mcp/actions/workflows/ci.yml"><img src="https://github.com/jjackk0k/pccheck-mcp/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/tools-100%25%20read--only-2ea44f" alt="100% read-only">
+  <img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen" alt="node >= 18">
+  <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license">
+</p>
 
 **Ask Claude "why is my PC slow?" and get a real answer — not generic advice.**
 
-PCCheck is an MCP server that gives Claude read-only eyes into your computer: hardware specs, live CPU/GPU/RAM load, temperatures, disk space hogs, startup bloat, crash history, and wifi quality. Claude stops guessing and starts diagnosing.
+PCCheck is an MCP server that gives Claude read-only eyes into your computer: hardware specs, live CPU/GPU/RAM load, temperatures, disk space hogs, startup bloat, crash history, wifi quality, and a real speed test. Claude stops guessing and starts diagnosing.
 
-<!-- DEMO GIF GOES HERE — 15-25s: type "why is my PC slow?", tool calls fire, verdict appears. See PUBLISH.md step 1. -->
+<!-- DEMO GIF GOES HERE — 15-25s: type "why is my PC slow?", tool calls fire, verdict appears. See PUBLISH.md. -->
 
 > 🧑‍⚕️ *"Your GPU is fine and your CPU is idling — but Chrome is holding 9GB of RAM, your C: drive is 96% full, and there's a 20GB VM image in Downloads you probably forgot about. Delete that and you'll feel the difference."*
 > — the kind of answer this unlocks
@@ -17,6 +28,7 @@ PCCheck is an MCP server that gives Claude read-only eyes into your computer: ha
 - 🎮 "Can my PC run Cyberpunk 2077 at 1440p?" / "Why does my game stutter?"
 - 💥 "Why did my PC crash yesterday?"
 - 📶 "Is my wifi the problem, or my internet provider?"
+- ⚡ "How fast is my internet actually?"
 - 🔥 "Is my PC running too hot?"
 - 🧹 "Roast my startup programs."
 - 🔋 "Should I replace my laptop battery?"
@@ -25,17 +37,17 @@ PCCheck is an MCP server that gives Claude read-only eyes into your computer: ha
 
 The **Claude Desktop app** (Windows or Mac — the free plan works) or **Claude Code**. The claude.ai website and the mobile app can't run local extensions — they can't see your PC.
 
-PCCheck is **Windows-first** (crash logs, antivirus status, startup toggles are Windows-only for now); specs, performance, disk, and network checks also work on macOS and Linux.
+PCCheck is **Windows-first** (crash logs, antivirus status, startup toggles are Windows-only for now); specs, performance, disk, network, and speed checks also work on macOS and Linux.
 
 ## Install
 
 ### Option 1 — Claude Desktop, one click (recommended)
 
-1. Download `pccheck.mcpb` from the [latest release](https://github.com/YOUR-GITHUB-USERNAME/pccheck-mcp/releases/latest)
+1. Download `pccheck.mcpb` from the [latest release](https://github.com/jjackk0k/pccheck-mcp/releases/latest)
 2. Double-click it (or drag into Claude Desktop → Settings → Extensions)
 3. Click **Install**. No terminal, no Node.js, nothing else.
 
-**Check it worked:** ask Claude *"run a full checkup on my PC."* The first time, Claude will ask permission for each tool — click Allow.
+**Check it worked:** ask Claude *"run a full checkup on my PC."* The first time, Claude will ask permission for each tool — click Allow. (PCCheck also adds one-click prompts to Claude Desktop's **+** menu: *Full PC checkup*, *Why is my PC slow?*, *Free up disk space*.)
 
 ### Option 2 — Claude Code (one command)
 
@@ -58,7 +70,9 @@ claude mcp add pccheck -- npx -y pccheck-mcp
 
 On Windows, if your client needs it: `"command": "cmd", "args": ["/c", "npx", "-y", "pccheck-mcp"]`.
 
-## What Claude sees (13 tools)
+> **Note:** npx install requires the package on npm — until `pccheck-mcp` is published there, use the `.mcpb` release file (Option 1) or clone + `npm run build` + point your config at `dist/index.js`.
+
+## What Claude sees (14 tools)
 
 | Tool | Answers | Platforms |
 |---|---|---|
@@ -71,15 +85,16 @@ On Windows, if your client needs it: `"command": "cmd", "args": ["/c", "npx", "-
 | `disk_space` | Drive fullness + SSD/HDD health (SMART) | all |
 | `scan_folder_sizes` | "What's eating my disk?" — ranks folders by size | all |
 | `startup_programs` | Boot bloat, including which items are actually enabled | Windows (basic on Mac/Linux) |
-| `network_check` | Router vs internet pings — "bad wifi" vs "bad ISP" (latency & loss, not Mbps) | all |
+| `network_check` | Router vs internet pings — "bad wifi" vs "bad ISP" (latency & loss) | all |
+| `speed_test` | "How fast is my internet?" — actual download Mbps | all |
 | `crash_report` | Blue screens, freezes, app crashes, antivirus, pending reboots | Windows |
 | `installed_software` | Biggest / most recent installs — find the bloat | Windows (names-only on Mac) |
 | `battery_health` | Wear level, cycle count, charge state | all |
 
 ## Privacy & safety — read this, it's honest
 
-- **100% read-only.** There is no tool that can change, delete, install, or configure anything. The worst PCCheck can do is *look*. (~1,200 lines of TypeScript across 11 files, 3 runtime dependencies — auditable in one sitting.)
-- **PCCheck itself sends nothing anywhere.** No telemetry, no accounts, no external APIs. Its only network activity is the latency test in `network_check`: standard pings to your router, `1.1.1.1`, and `8.8.8.8`.
+- **100% read-only.** There is no tool that can change, delete, install, or configure anything. The worst PCCheck can do is *look*. (~1,300 lines of TypeScript, 3 runtime dependencies — auditable in one sitting.)
+- **PCCheck itself sends nothing about you anywhere.** No telemetry, no accounts, no external APIs. Its only network activity: the latency test in `network_check` (standard pings to your router, `1.1.1.1`, `8.8.8.8`) and `speed_test`, which *downloads* throwaway data from Cloudflare's public speed endpoint — nothing is uploaded.
 - **But be clear about how MCP works:** results Claude asks for become part of your Claude conversation, which is processed by Anthropic like anything else you type. Depending on what you ask, that can include:
 
   | If Claude calls… | Your conversation will contain… |
@@ -102,7 +117,7 @@ On Windows, if your client needs it: `"command": "cmd", "args": ["/c", "npx", "-
 
 **Does the free Claude plan work?** Yes.
 
-**Mac/Linux?** Yes for specs, performance, disk, network, battery. Crash logs, antivirus, and startup-toggle detail are Windows-only right now.
+**Mac/Linux?** Yes for specs, performance, disk, network, speed test, battery. Crash logs, antivirus, and startup-toggle detail are Windows-only right now.
 
 **How do I uninstall?** Claude Desktop: Settings → Extensions → PCCheck → Remove. Claude Code: `claude mcp remove pccheck`.
 
@@ -116,16 +131,17 @@ On Windows, if your client needs it: `"command": "cmd", "args": ["/c", "npx", "-
 ## Development
 
 ```bash
-git clone https://github.com/YOUR-GITHUB-USERNAME/pccheck-mcp
+git clone https://github.com/jjackk0k/pccheck-mcp
 cd pccheck-mcp
 npm install
 npm run build
-npm run smoke   # exercises all 13 tools over real stdio JSON-RPC
+npm run smoke   # exercises all 14 tools over real stdio JSON-RPC
 ```
+
+CI runs the same smoke suite on Windows and Linux runners for every push.
 
 ## Roadmap
 
-- **Internet speed test** (download Mbps, clearly disclosed) — most-requested next
 - Windows Task Scheduler startup entries
 - Deeper macOS/Linux parity (startup items, installed apps with sizes)
 - Optional LibreHardwareMonitor bridge for full sensor data (CPU temp without admin)

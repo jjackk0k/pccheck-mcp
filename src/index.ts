@@ -12,8 +12,22 @@ import { startupPrograms } from "./tools/startup.js";
 import { networkCheck } from "./tools/network.js";
 import { crashAndHealthReport } from "./tools/health.js";
 import { installedSoftware } from "./tools/software.js";
+import { speedTest } from "./tools/speedtest.js";
 
-const VERSION = "0.1.0";
+const VERSION = "0.2.0";
+
+if (process.argv.includes("--version") || process.argv.includes("-v")) {
+  console.log(VERSION);
+  process.exit(0);
+}
+if (process.argv.includes("--help") || process.argv.includes("-h")) {
+  console.log(
+    `pccheck-mcp v${VERSION} — read-only PC diagnostics over MCP (stdio)\n` +
+      `Not meant to be run by hand: point your MCP client at this binary.\n` +
+      `Docs: https://github.com/jjackk0k/pccheck-mcp`,
+  );
+  process.exit(0);
+}
 
 const server = new McpServer(
   { name: "pccheck", version: VERSION },
@@ -24,6 +38,7 @@ const server = new McpServer(
       "Present results as a friendly diagnosis: verdict first, then evidence in plain language. " +
       "Numbers alone mean nothing to most users — always interpret them. " +
       "Gaming complaints (stutter, low FPS, crashes in games): call performance_snapshot + temperatures + gpu_info together. " +
+      "'How fast is my internet' → speed_test; 'why is my internet broken/laggy' → network_check. " +
       "These tools NEVER change anything; when a fix is needed, explain how the user can do it themselves.",
   },
 );
@@ -180,6 +195,20 @@ server.registerTool(
 );
 
 server.registerTool(
+  "speed_test",
+  {
+    title: "Internet speed test",
+    description:
+      "Measure actual download speed in Mbps (plus time-to-first-byte). Use when the user asks 'how fast is my internet' or says speeds don't match what they pay for. Downloads throwaway test data from Cloudflare's public speed endpoint — nothing is uploaded. Takes ~8-10 seconds. For connection problems (drops, lag, 'wifi vs ISP'), use network_check instead.",
+    inputSchema: {
+      seconds: z.number().int().min(3).max(20).optional().describe("Test duration (default 8)"),
+    },
+    annotations: { ...RO, openWorldHint: true },
+  },
+  safe(async (args: { seconds?: number }) => text(await speedTest(args))),
+);
+
+server.registerTool(
   "battery_health",
   {
     title: "Battery health",
@@ -188,6 +217,35 @@ server.registerTool(
     annotations: RO,
   },
   safe(async () => text(await batteryHealth())),
+);
+
+// Prompts appear in Claude Desktop's "+" menu — one-click entry points for non-technical users.
+const prompt = (textBody: string) => () => ({
+  messages: [{ role: "user" as const, content: { type: "text" as const, text: textBody } }],
+});
+
+server.registerPrompt(
+  "full-checkup",
+  { title: "Full PC checkup", description: "Complete health check with a friendly diagnosis" },
+  prompt(
+    "Run a full checkup on my PC using the pccheck tools. Present it like a friendly PC technician: overall verdict first, then key findings in plain language (no raw JSON), then a prioritized list of fixes I can do myself.",
+  ),
+);
+
+server.registerPrompt(
+  "why-is-my-pc-slow",
+  { title: "Why is my PC slow?", description: "Find what's slowing this computer down right now" },
+  prompt(
+    "My PC feels slow. Use the pccheck tools to find out why — check live performance first, then anything else the evidence points to (disk space, temperatures, startup bloat). Tell me the most likely cause in plain language and exactly how to fix it myself.",
+  ),
+);
+
+server.registerPrompt(
+  "free-up-space",
+  { title: "Free up disk space", description: "Find what's eating the disk and what's safe to remove" },
+  prompt(
+    "Help me free up disk space. Use the pccheck tools to see how full my drives are and what's taking the space (scan my biggest folders, check installed programs by size). Then give me a safe cleanup list — biggest wins first, and warn me about anything I shouldn't delete.",
+  ),
 );
 
 async function main() {

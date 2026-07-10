@@ -2,7 +2,14 @@
   "manifest_version": "0.2",
   "name": "pccheck",
   "display_name": "PCCheck — PC Health for Claude",
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "homepage": "https://github.com/jjackk0k/pccheck-mcp",
+  "documentation": "https://github.com/jjackk0k/pccheck-mcp#readme",
+  "support": "https://github.com/jjackk0k/pccheck-mcp/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jjackk0k/pccheck-mcp"
+  },
   "description": "Ask Claude why your PC is slow and get a real answer: specs, live performance, temperatures, disk hogs, crashes, and wifi — 100% read-only.",
   "long_description": "PCCheck gives Claude read-only eyes into your computer: hardware specs, live CPU/GPU/RAM load, temperatures, disk space and what's eating it, startup bloat, blue-screen history, antivirus status, and wifi quality. Windows-first; core checks also work on macOS and Linux.\n\nAsk things like:\n- \"Run a full checkup on my PC\"\n- \"Why is my computer slow right now?\"\n- \"What's eating my disk space?\"\n- \"Can my PC run Cyberpunk 2077?\"\n- \"Why did my PC crash yesterday?\"\n- \"Is my wifi the problem or my internet provider?\"\n\nPrivacy: every tool is strictly read-only — nothing can be changed, deleted, or installed. PCCheck itself has no telemetry, accounts, or external APIs (its only network activity is the latency test: pings to your router, 1.1.1.1, and 8.8.8.8). Note that, like any MCP tool, results Claude requests become part of your Claude conversation.",
   "icon": "icon.png",
@@ -30,6 +37,7 @@
     { "name": "scan_folder_sizes", "description": "Rank folders by size to find space hogs" },
     { "name": "startup_programs", "description": "Boot programs and their enabled/disabled state" },
     { "name": "network_check", "description": "Router-vs-internet ping diagnosis and wifi quality" },
+    { "name": "speed_test", "description": "Actual download speed in Mbps (Cloudflare endpoint)" },
     { "name": "crash_report", "description": "Blue screens, app crashes, freezes, antivirus, disk SMART" },
     { "name": "installed_software", "description": "Installed programs by size or install date" },
     { "name": "battery_health", "description": "Laptop battery wear and charge status" }

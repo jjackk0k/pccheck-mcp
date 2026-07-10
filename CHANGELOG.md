@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0 — 2026-07-10
+
+- **New tool: `speed_test`** — actual download Mbps via Cloudflare's public speed endpoint (download-only, disclosed in privacy docs)
+- **MCP prompts** — *Full PC checkup*, *Why is my PC slow?*, *Free up disk space* appear in Claude Desktop's + menu
+- Renamed `crash_and_health_report` → `crash_report`; clearer routing cues for freezes, game stutter, and "loud fan" complaints
+- Network diagnosis no longer blames "local problem" when a router merely blocks ping; wifi-signal blame only applies when traffic actually routes over wifi; DNS lookup time-boxed
+- Startup programs: disabled startup-folder items are now detected correctly (`.lnk` name matching, case-insensitive)
+- Folder scanner enforces its time budget in all paths (large flat folders, queued walks)
+- `--version` / `--help` CLI flags; icon; compact `full_checkup` output (~22% fewer tokens); honest "What Claude sees" privacy table; CI (build + smoke on Windows & Linux)
+
 ## 0.1.0 — 2026-07-10
 
 Initial release.

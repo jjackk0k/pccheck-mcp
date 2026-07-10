@@ -1,10 +1,18 @@
 {
   "name": "pccheck-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Give Claude X-ray vision into your PC. Read-only MCP server for hardware specs, live performance, temperatures, disk space hogs, crash history, startup bloat, and wifi diagnostics — so \"why is my PC slow?\" finally gets a real answer.",
   "type": "module",
   "license": "MIT",
-  "mcpName": "io.github.jacknaughton/pccheck-mcp",
+  "mcpName": "io.github.jjackk0k/pccheck-mcp",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jjackk0k/pccheck-mcp.git"
+  },
+  "homepage": "https://github.com/jjackk0k/pccheck-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/jjackk0k/pccheck-mcp/issues"
+  },
   "bin": {
     "pccheck-mcp": "dist/index.js"
   },
