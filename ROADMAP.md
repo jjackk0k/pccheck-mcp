@@ -2,24 +2,26 @@
 
 Working doc for whoever (human or Claude session) picks this up next. Keep it current.
 
-## State as of 2026-07-10
+## State as of 2026-07-10 (evening)
 
-- v0.1.0 built, all 13 tools smoke-tested green on Windows 11 (`npm run smoke`)
+- **v0.2.0 PUBLISHED: https://github.com/jjackk0k/pccheck-mcp** — release v0.2.0 with `pccheck.mcpb` (3.5MB) attached, repo topics set
+- 14 tools smoke-tested green (`npm run smoke`), incl. new `speed_test` (chunked Cloudflare downloads — single big requests 403)
+- 3 MCP prompts for Claude Desktop's + menu; `--version`/`--help`; icon; README with logo/badges/honest privacy table
 - Wired into Jack's Claude Code (user scope) + Claude Desktop config
-- `pccheck.mcpb` one-click bundle packs clean (3.4MB) via `node scripts/bundle.mjs`
-- NOT yet published: needs Jack's GitHub + npm accounts (see PUBLISH.md, incl. placeholder replacement)
+- CI staged in `.github/workflows-pending/` — Jack's gh token lacks `workflow` scope (activation steps at top of PUBLISH.md)
 
 ## Next up (rough priority)
 
-1. **Internet speed test tool** (download Mbps + disclosed clearly in privacy section) — UX review says this is the #1 feature users will ask for
-2. **Demo assets**: GIF of "why is my PC slow?" → diagnosis (spec in PUBLISH.md step 1); screenshots for README
-3. **Landing page**: single-page site (GitHub Pages) with the pitch + install buttons
-4. **Publish** (blocked on Jack: GitHub repo, npm account, then registry + directories — PUBLISH.md)
-5. Windows Task Scheduler startup entries in `startup_programs`
-6. macOS/Linux parity pass (installed apps with sizes, login items polish; mac System Events permission popup needs a graceful pre-note)
-7. "What changed since last checkup?" — cache last full_checkup to `~/.pccheck/last.json` (opt-in, still read-only wrt the system)
-8. LibreHardwareMonitor bridge for CPU temps without admin
-9. Localized-Windows hardening (non-English event log / netsh output)
+1. **Jack, 5 min:** `gh auth refresh -h github.com -s workflow` → activate CI (PUBLISH.md top) — green badge = trust
+2. **Jack, 10 min:** `npm login` + `npm publish` (unlocks `npx pccheck-mcp`), then `mcp-publisher` registry publish (PUBLISH.md)
+3. **Demo assets**: GIF of "why is my PC slow?" → diagnosis (spec in PUBLISH.md); screenshots for README
+4. **Directory submissions** after npm: Anthropic extension directory, PulseMCP, mcp.so, Smithery (PUBLISH.md step 6)
+5. **Landing page**: single-page site (GitHub Pages) with the pitch + install buttons
+6. Windows Task Scheduler startup entries in `startup_programs`
+7. macOS/Linux parity pass (installed apps with sizes, login items polish; mac System Events permission popup needs a graceful pre-note)
+8. "What changed since last checkup?" — cache last full_checkup to `~/.pccheck/last.json` (opt-in, still read-only wrt the system)
+9. LibreHardwareMonitor bridge for CPU temps without admin
+10. Localized-Windows hardening (non-English event log / netsh output)
 
 ## Done
 
