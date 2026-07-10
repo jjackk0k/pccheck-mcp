@@ -5,7 +5,8 @@
 <h1 align="center">🩺 PCCheck — let Claude actually check your PC</h1>
 
 <p align="center">
-  <a href="https://github.com/jjackk0k/pccheck-mcp/actions/workflows/ci.yml"><img src="https://github.com/jjackk0k/pccheck-mcp/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <!-- CI badge goes live once .github/workflows-pending/ci.yml is activated (see PUBLISH.md):
+  <a href="https://github.com/jjackk0k/pccheck-mcp/actions/workflows/ci.yml"><img src="https://github.com/jjackk0k/pccheck-mcp/actions/workflows/ci.yml/badge.svg" alt="CI"></a> -->
   <img src="https://img.shields.io/badge/tools-100%25%20read--only-2ea44f" alt="100% read-only">
   <img src="https://img.shields.io/badge/node-%3E%3D18-brightgreen" alt="node >= 18">
   <img src="https://img.shields.io/badge/license-MIT-blue" alt="MIT license">

@@ -1,6 +1,18 @@
 # Publishing playbook — from this folder to actual users
 
-Everything below is ready; the steps marked 🔑 need your accounts/credentials, so Claude can't do them alone (but can do them with you in an interactive session once GitHub/npm are authenticated).
+**Status 2026-07-10:** ✅ GitHub repo live (https://github.com/jjackk0k/pccheck-mcp) with v0.2.0 release + `pccheck.mcpb` attached. Remaining steps marked 🔑 need your accounts/credentials.
+
+## ⚡ Activate CI (2 minutes, one-time)
+
+The CI workflow (build + 14-tool smoke on Windows & Linux) couldn't be pushed — your `gh` token lacks the `workflow` scope. To activate:
+
+```bash
+gh auth refresh -h github.com -s workflow    # approve in browser
+git mv .github/workflows-pending/ci.yml .github/workflows/ci.yml
+git commit -m "Activate CI" && git push
+```
+
+Then un-comment the CI badge at the top of README.md and push again.
 
 ## 0. Replace placeholders (2 minutes)
 
