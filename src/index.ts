@@ -13,8 +13,9 @@ import { networkCheck } from "./tools/network.js";
 import { crashAndHealthReport } from "./tools/health.js";
 import { installedSoftware } from "./tools/software.js";
 import { speedTest } from "./tools/speedtest.js";
+import { whatChanged } from "./tools/changes.js";
 
-const VERSION = "0.2.0";
+const VERSION = "0.3.0";
 
 if (process.argv.includes("--version") || process.argv.includes("-v")) {
   console.log(VERSION);
@@ -39,6 +40,7 @@ const server = new McpServer(
       "Numbers alone mean nothing to most users — always interpret them. " +
       "Gaming complaints (stutter, low FPS, crashes in games): call performance_snapshot + temperatures + gpu_info together. " +
       "'How fast is my internet' → speed_test; 'why is my internet broken/laggy' → network_check. " +
+      "'It got slower recently / after some update' → what_changed. " +
       "These tools NEVER change anything; when a fix is needed, explain how the user can do it themselves.",
   },
 );
@@ -192,6 +194,17 @@ server.registerTool(
   safe(async (args: { limit?: number; filter?: string; sort_by?: "size" | "name" | "recent" }) =>
     text(await installedSoftware(args)),
   ),
+);
+
+server.registerTool(
+  "what_changed",
+  {
+    title: "What changed on this PC?",
+    description:
+      "Compare the PC now vs the previous run of this tool: disk-space changes, programs installed/removed/updated, new startup items, GPU-driver and Windows updates. Use for 'my PC got slower recently', 'what changed after that update', or periodic checkups. The first run saves a baseline; each later run diffs against the last and rolls it forward. This is the only PCCheck tool that writes anything: one snapshot file in ~/.pccheck (delete it anytime).",
+    annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+  },
+  safe(async () => text(await whatChanged())),
 );
 
 server.registerTool(

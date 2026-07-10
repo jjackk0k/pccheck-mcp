@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 — 2026-07-10
+
+- **New tool: `what_changed`** — snapshot diffing: disk-space deltas, programs installed/removed/updated, new startup items, GPU-driver and Windows-build changes since the last run. First run saves a baseline to `~/.pccheck` (the only file PCCheck ever writes).
+- **`startup_programs` now includes Task Scheduler logon/boot tasks** (non-Microsoft) — a whole class of boot bloat that Task Manager's Startup tab doesn't show.
+- **`performance_snapshot` gained bottleneck analysis** — cross-references CPU saturation, single-core limits, RAM pressure/swapping, GPU utilization, and VRAM fullness into plain-language verdicts.
+
 ## 0.2.0 — 2026-07-10
 
 - **New tool: `speed_test`** — actual download Mbps via Cloudflare's public speed endpoint (download-only, disclosed in privacy docs)

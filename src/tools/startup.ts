@@ -36,9 +36,29 @@ foreach ($rk in @(
 @{ items = $items; approved = $approved } | ConvertTo-Json -Depth 4
 `.trim();
 
+const TASKS_SCRIPT = `
+try {
+  $tasks = Get-ScheduledTask -ErrorAction Stop | Where-Object {
+    $_.State -ne 'Disabled' -and $_.TaskPath -notlike '\\Microsoft\\*' -and
+    ($_.Triggers | Where-Object { $_.CimClass.CimClassName -eq 'MSFT_TaskLogonTrigger' -or $_.CimClass.CimClassName -eq 'MSFT_TaskBootTrigger' })
+  } | Select-Object TaskName, TaskPath, @{n='State';e={$_.State.ToString()}}, @{n='Author';e={$_.Author}}
+  if ($tasks) { $tasks | ConvertTo-Json -Depth 2 } else { '[]' }
+} catch { 'null' }
+`.trim();
+
+interface WinScheduledTask {
+  TaskName: string;
+  TaskPath: string;
+  State: string;
+  Author: string | null;
+}
+
 export async function startupPrograms() {
   if (isWindows) {
-    const payload = await psJson<WinStartupPayload>(WIN_SCRIPT, 20_000);
+    const [payload, schedTasks] = await Promise.all([
+      psJson<WinStartupPayload>(WIN_SCRIPT, 20_000),
+      psJson<WinScheduledTask | WinScheduledTask[]>(TASKS_SCRIPT, 25_000),
+    ]);
     if (!payload) return { error: "Could not read startup programs (PowerShell query failed)." };
 
     // Registry names are case-insensitive, and StartupApproved\StartupFolder keys
@@ -61,11 +81,20 @@ export async function startupPrograms() {
     items.sort((a, b) => Number(b.enabled) - Number(a.enabled) || a.name.localeCompare(b.name));
 
     const enabledCount = items.filter((i) => i.enabled).length;
+    const scheduledTasks = asArray(schedTasks).map((t) => ({
+      name: t.TaskName,
+      path: t.TaskPath,
+      state: t.State,
+      author: t.Author || undefined,
+    }));
     return {
       enabledCount,
       disabledCount: items.length - enabledCount,
       items,
-      note: "Each enabled item adds to boot time and background load. Users can toggle these in Task Manager > Startup apps — this tool only reads them.",
+      scheduledTasksAtLogon: scheduledTasks.length
+        ? scheduledTasks
+        : "None found outside Microsoft's own (or query unavailable)",
+      note: "Each enabled item adds to boot time and background load. Users can toggle startup apps in Task Manager > Startup apps; scheduled tasks live in Task Scheduler. This tool only reads them.",
     };
   }
 

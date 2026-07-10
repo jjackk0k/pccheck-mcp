@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.jjackk0k/pccheck-mcp",
   "description": "Read-only PC health diagnostics for Claude: specs, live performance, temperatures, disk space hogs, crash history, startup bloat, speed test, and wifi checks.",
@@ -6,13 +6,13 @@
     "url": "https://github.com/jjackk0k/pccheck-mcp",
     "source": "github"
   },
-  "version": "0.2.0",
+  "version": "0.3.0",
   "packages": [
     {
       "registryType": "npm",
       "registryBaseUrl": "https://registry.npmjs.org",
       "identifier": "pccheck-mcp",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "transport": { "type": "stdio" }
     }
   ]

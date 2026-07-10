@@ -46,7 +46,31 @@ export async function performanceSnapshot() {
 
   const ramUsedPercent = round1((mem.active / mem.total) * 100);
 
+  // Cross-signal bottleneck analysis — the "so WHY is it slow?" layer
+  const overall = Math.round(load.currentLoad);
+  const busiest = perCore.length ? Math.max(...perCore) : 0;
+  const gpu0 = gpus?.[0];
+  const bottleneckHints: string[] = [];
+  if (overall >= 85) {
+    bottleneckHints.push(`CPU is saturated (${overall}%) — biggest consumer right now: ${topByCpu[0]?.name ?? "unknown"}.`);
+  } else if (busiest >= 92 && overall < 50) {
+    bottleneckHints.push(`One core is maxed (${busiest}%) while overall CPU is only ${overall}% — a single-threaded bottleneck; more cores won't help, faster per-core would.`);
+  }
+  if (ramUsedPercent != null && ramUsedPercent > 90) {
+    bottleneckHints.push(`RAM is nearly full (${ramUsedPercent}%) — Windows is likely swapping to disk, which feels like everything lags. Biggest consumer: ${topByMemory[0]?.name ?? "unknown"}.`);
+  }
+  if (gpu0?.utilizationPercent != null && gpu0.utilizationPercent >= 95) {
+    bottleneckHints.push(`GPU is maxed (${gpu0.utilizationPercent}%) — normal during gaming/rendering; if the desktop feels slow with nothing running, find what's using it.`);
+  }
+  if (gpu0?.vramUsedMB != null && gpu0.vramTotalMB != null && gpu0.vramUsedMB / gpu0.vramTotalMB > 0.93) {
+    bottleneckHints.push(`VRAM is nearly full (${gpu0.vramUsedMB}/${gpu0.vramTotalMB}MB) — causes stutter and texture pop-in in games; lowering texture quality usually fixes it.`);
+  }
+  if (bottleneckHints.length === 0) {
+    bottleneckHints.push("No obvious CPU/RAM/GPU bottleneck right now. If things still feel slow, check temperatures (thermal throttling) and disk_space (a nearly-full system drive).");
+  }
+
   return {
+    bottleneckAnalysis: bottleneckHints,
     cpu: {
       overallPercent: Math.round(load.currentLoad),
       perCorePercent: perCore,

@@ -26,22 +26,41 @@ function fmtDate(d: string | null): string | undefined {
   return `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6, 8)}`;
 }
 
+async function windowsAppsDeduped(): Promise<WinApp[]> {
+  const raw = await psJson<WinApp | WinApp[]>(WIN_SCRIPT, 30_000);
+  if (!raw) return [];
+  const byName = new Map<string, WinApp>();
+  for (const app of asArray(raw)) {
+    const existing = byName.get(app.DisplayName);
+    if (!existing || (app.SizeMB ?? 0) > (existing.SizeMB ?? 0)) byName.set(app.DisplayName, app);
+  }
+  return [...byName.values()];
+}
+
+/** Full installed-program list (name + version) for snapshot diffing. */
+export async function listInstalledApps(): Promise<{ name: string; version: string | null }[]> {
+  if (isWindows) {
+    return (await windowsAppsDeduped()).map((a) => ({ name: a.DisplayName, version: a.DisplayVersion ?? null }));
+  }
+  if (isMac) {
+    try {
+      const entries = await fs.readdir("/Applications");
+      return entries.filter((e) => e.endsWith(".app")).map((e) => ({ name: e.replace(/\.app$/, ""), version: null }));
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 export async function installedSoftware(args: { limit?: number; filter?: string; sort_by?: "size" | "name" | "recent" }) {
   const limit = Math.min(Math.max(args.limit ?? 25, 1), 100);
   const filter = args.filter?.toLowerCase();
   const sortBy = args.sort_by ?? "size";
 
   if (isWindows) {
-    const raw = await psJson<WinApp | WinApp[]>(WIN_SCRIPT, 30_000);
-    if (!raw) return { error: "Could not read installed programs from the registry." };
-
-    // Dedupe by name (32/64-bit keys overlap), keeping the entry with more info
-    const byName = new Map<string, WinApp>();
-    for (const app of asArray(raw)) {
-      const existing = byName.get(app.DisplayName);
-      if (!existing || (app.SizeMB ?? 0) > (existing.SizeMB ?? 0)) byName.set(app.DisplayName, app);
-    }
-    let apps = [...byName.values()];
+    let apps = await windowsAppsDeduped();
+    if (apps.length === 0) return { error: "Could not read installed programs from the registry." };
     const totalCount = apps.length;
 
     if (filter) {

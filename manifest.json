@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "pccheck",
   "display_name": "PCCheck — PC Health for Claude",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "homepage": "https://github.com/jjackk0k/pccheck-mcp",
   "documentation": "https://github.com/jjackk0k/pccheck-mcp#readme",
   "support": "https://github.com/jjackk0k/pccheck-mcp/issues",
@@ -38,6 +38,7 @@
     { "name": "startup_programs", "description": "Boot programs and their enabled/disabled state" },
     { "name": "network_check", "description": "Router-vs-internet ping diagnosis and wifi quality" },
     { "name": "speed_test", "description": "Actual download speed in Mbps (Cloudflare endpoint)" },
+    { "name": "what_changed", "description": "Diff vs last check: disk, programs, startup, drivers" },
     { "name": "crash_report", "description": "Blue screens, app crashes, freezes, antivirus, disk SMART" },
     { "name": "installed_software", "description": "Installed programs by size or install date" },
     { "name": "battery_health", "description": "Laptop battery wear and charge status" }

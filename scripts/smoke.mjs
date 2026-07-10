@@ -23,6 +23,8 @@ const CALLS = [
   ["network_check", {}],
   ["scan_folder_sizes", { path: path.join(os.homedir(), "Downloads"), time_budget_seconds: 10 }],
   ["speed_test", { seconds: 5 }],
+  ["what_changed", {}],
+  ["what_changed", {}],
   ["full_checkup", {}],
 ].filter(([name]) => !only || name === only);
 

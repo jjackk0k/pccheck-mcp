@@ -25,6 +25,7 @@ PCCheck is an MCP server that gives Claude read-only eyes into your computer: ha
 
 - 🔍 **"Run a full checkup on my PC"**
 - 🐌 "Why is my computer so slow *right now*?"
+- 📉 "My PC got slower lately — what changed?"
 - 💾 "What's eating my disk space?"
 - 🎮 "Can my PC run Cyberpunk 2077 at 1440p?" / "Why does my game stutter?"
 - 💥 "Why did my PC crash yesterday?"
@@ -73,7 +74,7 @@ On Windows, if your client needs it: `"command": "cmd", "args": ["/c", "npx", "-
 
 > **Note:** npx install requires the package on npm — until `pccheck-mcp` is published there, use the `.mcpb` release file (Option 1) or clone + `npm run build` + point your config at `dist/index.js`.
 
-## What Claude sees (14 tools)
+## What Claude sees (15 tools)
 
 | Tool | Answers | Platforms |
 |---|---|---|
@@ -88,13 +89,14 @@ On Windows, if your client needs it: `"command": "cmd", "args": ["/c", "npx", "-
 | `startup_programs` | Boot bloat, including which items are actually enabled | Windows (basic on Mac/Linux) |
 | `network_check` | Router vs internet pings — "bad wifi" vs "bad ISP" (latency & loss) | all |
 | `speed_test` | "How fast is my internet?" — actual download Mbps | all |
+| `what_changed` | "It got slower recently" — diff vs the last checkup | all |
 | `crash_report` | Blue screens, freezes, app crashes, antivirus, pending reboots | Windows |
 | `installed_software` | Biggest / most recent installs — find the bloat | Windows (names-only on Mac) |
 | `battery_health` | Wear level, cycle count, charge state | all |
 
 ## Privacy & safety — read this, it's honest
 
-- **100% read-only.** There is no tool that can change, delete, install, or configure anything. The worst PCCheck can do is *look*. (~1,300 lines of TypeScript, 3 runtime dependencies — auditable in one sitting.)
+- **Read-only by design.** No tool can change, delete, install, or configure anything on your system. The worst PCCheck can do is *look*. The single exception to "writes nothing": `what_changed` keeps one snapshot file in `~/.pccheck` so it can tell you what changed later — delete it anytime. (~1,500 lines of TypeScript, 3 runtime dependencies — auditable in one sitting.)
 - **PCCheck itself sends nothing about you anywhere.** No telemetry, no accounts, no external APIs. Its only network activity: the latency test in `network_check` (standard pings to your router, `1.1.1.1`, `8.8.8.8`) and `speed_test`, which *downloads* throwaway data from Cloudflare's public speed endpoint — nothing is uploaded.
 - **But be clear about how MCP works:** results Claude asks for become part of your Claude conversation, which is processed by Anthropic like anything else you type. Depending on what you ask, that can include:
 
@@ -136,14 +138,13 @@ git clone https://github.com/jjackk0k/pccheck-mcp
 cd pccheck-mcp
 npm install
 npm run build
-npm run smoke   # exercises all 14 tools over real stdio JSON-RPC
+npm run smoke   # exercises all 15 tools over real stdio JSON-RPC
 ```
 
 CI runs the same smoke suite on Windows and Linux runners for every push.
 
 ## Roadmap
 
-- Windows Task Scheduler startup entries
 - Deeper macOS/Linux parity (startup items, installed apps with sizes)
 - Optional LibreHardwareMonitor bridge for full sensor data (CPU temp without admin)
 - "What changed since yesterday?" snapshot diffing
