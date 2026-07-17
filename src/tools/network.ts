@@ -73,11 +73,13 @@ async function wifiInfo() {
 }
 
 export async function networkCheck() {
-  const [ifaces, gateway, wifi, dns] = await Promise.all([
+  // Measured in isolation: the si/wifi calls below spawn PowerShell and block the
+  // event loop, inflating a concurrent DNS timing from ~10ms to ~190ms.
+  const dns = await dnsTiming();
+  const [ifaces, gateway, wifi] = await Promise.all([
     withTimeout(si.networkInterfaces() as Promise<si.Systeminformation.NetworkInterfacesData[]>, 8000, []),
     withTimeout(si.networkGatewayDefault(), 8000, ""),
     wifiInfo(),
-    dnsTiming(),
   ]);
 
   const active = (Array.isArray(ifaces) ? ifaces : [ifaces])
